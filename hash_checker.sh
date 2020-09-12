@@ -77,7 +77,7 @@ if [ "$1" != "--short" ]; then
 printf "GENERATED AT:  "
 date +"%H:%M %e-%b-%y"
 printf "\n"
-printf "Worker\t\tTarget\tDiff\t%%\tIP\n"
+printf "Worker\t\tTarget\tDiff\t(perc)\tIP\n"
 printf "============================START===========================\n"
 
 fi
