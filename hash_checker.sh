@@ -28,7 +28,11 @@ hash_curl_full=0
 w_down=0
 excluded_hash=0
 
-printf "\nPlease wait to get the results\n"
+if [ "$1" != "--short" ]; then
+
+>&2 printf "Please wait to get the results\n"
+
+fi
 
 foo() {
 #curl_min_hash_a[$j]=`timeout $curl_time curl --silent $w_ip_port | html2text -width 200 | grep "1 minute average\|Average speed" | tail -1 | grep -o -P '(?<=speed: ).*(?=Mh/s)'| cut -d. -f1 &`
@@ -39,7 +43,9 @@ for j in `seq 1 $(($workers_count+1))`;
 
         do
 #	sleep 0.2
-	printf "."
+	if [ "$1" != "--short" ]; then
+	>&2 printf "."
+	fi
         line=`printf "$workers_file_read" | sed "$j!d" `
 
         w_name=`printf "$line" | awk '{printf $1}'`
@@ -64,14 +70,19 @@ for j in `seq 1 $(($workers_count+1))`;
 
 foo
 done
+>&2 printf "\n"
 
-printf "\n\nResults are taken, wait the $curl_time seconds timeout and checking ...\n\n"
+if [ "$1" != "--short" ]; then
+
+printf "GENERATED AT:  "
+date +"%H:%M %e-%b-%y"
+printf "\n"
+printf "Worker\t\tTarget\tDiff\t%%\tIP\n"
+printf "============================START===========================\n"
+
+fi
 
 wait
-
-#sleep $curl_time;
-printf "Worker\t\tTarget\tDiff\t%%\tIP\n"
-printf "=============================================================\n"
 
 for i in `seq 1 $(($workers_count+1))`;
 
@@ -100,14 +111,14 @@ for i in `seq 1 $(($workers_count+1))`;
 			if [ $hash_diff_perc -lt -4 ]; then
 				if [ $hash_diff_perc -eq -100 ]; then
 
-                        printf "\033[0;41m$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc%%\t$w_ip\e[0m\n"
+                        printf "\033[0;41m$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc\t$w_ip\e[0m\n"
 
 			w_down=$((w_down + 1))
 				else
-			printf "$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc%%\t$w_ip\n"
+			printf "$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc\t$w_ip\n"
 				fi
 			elif [ "$1" = "--full" ] || [ "$3" = "--full" ]; then
-                        printf "$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc%%\t$w_ip\n"
+                        printf "$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc\t$w_ip\n"
 
 #			else
 #			printf "RIG OK\n"
@@ -120,17 +131,14 @@ for i in `seq 1 $(($workers_count+1))`;
 
 done
 
-printf "=============================================================\n"
-#printf "Statistics:\n"
+if [ "$1" != "--short" ]; then
+printf "=============================END============================\n"
 
 hash_target_full=$(($hash_target_full-$excluded_hash))
 hash_curl_full=$(($hash_curl_full-$excluded_hash))
 hash_diff_perc_full=$(($hash_loss*100 / $hash_target_full))
 
-#printf "Target hashrate (full):\t\t $hash_target_full\n"
-#printf "RIGs actual hashrate (full):\t $hash_curl_full\n"
-#printf "Hashrate LOSS:\t\t\t $hash_loss\n"
-printf "SUM:\t\t$hash_target_full\t$hash_loss\t$hash_diff_perc_full%%\tDown: $w_down\n"
+printf "SUM:\t\t$hash_target_full\t$hash_loss\t$hash_diff_perc_full\tDown: $w_down\n"
 
 printf "Active: $hash_curl_full\n"
 
@@ -139,4 +147,5 @@ printf "\n\n"
 printf "=============================================================\n"
 printf "Excluded hash: \t\t\t $excluded_hash\n"
 printf "=============================================================\n"
+fi
 fi
