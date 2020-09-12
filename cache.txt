@@ -1,6 +1,6 @@
 GENERATED AT:  21:23 12-Sep-20
 
-Worker		Target	Diff	%	IP
+Worker		Target	Diff		IP
 ============================START===========================
 [0;41mr01ge		340	-340	-100	10.10.110.2[0m
 r1001		275	-32	-11	192.168.10.1
