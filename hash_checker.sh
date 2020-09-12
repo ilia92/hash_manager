@@ -43,7 +43,7 @@ for j in `seq 1 $(($workers_count+1))`;
         line=`printf "$workers_file_read" | sed "$j!d" `
 
         w_name=`printf "$line" | awk '{printf $1}'`
-#        w_type=`printf "$line" | awk '{printf $2}'`
+#        w_cards=`printf "$line" | awk '{printf $3}'`
         w_target=`printf "$line" | awk '{printf $4}'`
         w_ip=`printf "$line" | awk '{printf $5}'`
 
@@ -70,6 +70,8 @@ printf "\n\nResults are taken, wait the $curl_time seconds timeout and checking 
 wait
 
 #sleep $curl_time;
+printf "Worker\t\tTarget\tDiff\t%%\tIP\n"
+printf "=============================================================\n"
 
 for i in `seq 1 $(($workers_count+1))`;
 
@@ -77,7 +79,7 @@ for i in `seq 1 $(($workers_count+1))`;
 	line=`printf "$workers_file_read" | sed "$i!d" `
 
 	w_name=`printf "$line" | awk '{printf $1}'`
-	w_type=`printf "$line" | awk '{printf $2}'`
+	w_cards=`printf "$line" | awk '{printf $3}'`
 	w_target=`printf "$line" | awk '{printf $4}'`
 	w_ip=`printf "$line" | awk '{printf $5}'`
 
@@ -94,31 +96,19 @@ for i in `seq 1 $(($workers_count+1))`;
 #			if [ $hash_diff -lt 0 ]; then
 			hash_loss=$(($hash_loss+$hash_diff))
 #			fi
-			hash_diff_proc=$(($hash_diff*100 / $w_target))
-			if [ $hash_diff_proc -lt -4 ]; then
-				if [ $hash_diff_proc -eq -100 ]; then
+			hash_diff_perc=$(($hash_diff*100 / $w_target))
+			if [ $hash_diff_perc -lt -4 ]; then
+				if [ $hash_diff_perc -eq -100 ]; then
 
-                        printf "==========================================\n"
-#			printf "\033[0;41m"
-                        printf "\033[0;41mWorker name:\t$w_name\e[0m\n"
-                        printf "\033[0;41mIP address:\t$w_ip\e[0m\n"
-                        printf "\033[0;41mHash difference:\t $hash_diff\e[0m\n"
-                        printf "\033[0;41mHash diff (percent) :\t $hash_diff_proc %%\e[0m\n"
+                        printf "\033[0;41m$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc%%\t$w_ip\e[0m\n"
 
 			w_down=$((w_down + 1))
 				else
-                        printf "==========================================\n"
-                        printf "Worker name:\t$w_name\n"
-                        printf "IP address:\t$w_ip\n"
-                        printf "Hash difference:\t $hash_diff\n"
-                        printf "Hash diff (percent) :\t $hash_diff_proc %% \n"
+			printf "$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc%%\t$w_ip\n"
 				fi
 			elif [ "$1" = "--full" ] || [ "$3" = "--full" ]; then
-                        printf "==========================================\n"
-                        printf "Worker name:\t$w_name\n"
-                        printf "IP address:\t$w_ip\n"
-                        printf "Hash difference:\t $hash_diff\n"
-                        printf "Hash diff (percent) :\t $hash_diff_proc %% \n"
+                        printf "$w_name\t\t$w_target\t$hash_diff\t$hash_diff_perc%%\t$w_ip\n"
+
 #			else
 #			printf "RIG OK\n"
 			fi
@@ -131,17 +121,22 @@ for i in `seq 1 $(($workers_count+1))`;
 done
 
 printf "=============================================================\n"
-printf "Statistics:\n"
+#printf "Statistics:\n"
 
 hash_target_full=$(($hash_target_full-$excluded_hash))
 hash_curl_full=$(($hash_curl_full-$excluded_hash))
+hash_diff_perc_full=$(($hash_loss*100 / $hash_target_full))
 
-printf "Target hashrate (full):\t\t $hash_target_full\n"
-printf "RIGs actual hashrate (full):\t $hash_curl_full\n"
-printf "Hashrate LOSS:\t\t\t $hash_loss\n"
-printf "Workers down: \t\t\t $w_down\n"
+#printf "Target hashrate (full):\t\t $hash_target_full\n"
+#printf "RIGs actual hashrate (full):\t $hash_curl_full\n"
+#printf "Hashrate LOSS:\t\t\t $hash_loss\n"
+printf "SUM:\t\t$hash_target_full\t$hash_loss\t$hash_diff_perc_full%%\tDown: $w_down\n"
 
+printf "Active: $hash_curl_full\n"
+
+if [ $excluded_hash -ne 0 ]; then
+printf "\n\n"
 printf "=============================================================\n"
 printf "Excluded hash: \t\t\t $excluded_hash\n"
 printf "=============================================================\n"
-
+fi
