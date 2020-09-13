@@ -2,3 +2,4 @@
 #workers.txt-*
 .api_key
 .workers_down
+cache.txt
