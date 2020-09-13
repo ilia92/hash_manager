@@ -20,6 +20,7 @@ help_section="
 /full - Check all rigs
 /recheck - Rechecks rig hashrate
 /renull - Clear memory and start notifying again
+/cache - Shows cached results
 "
 
 sendtext() {
@@ -57,6 +58,7 @@ case "$command" in
         ("/full") result=`$DIR/hash_checker.sh --full | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | grep -v GENERATED | awk {'printf $1"   "$2"   "$3"   "$4"\n"'} | sed '/=START=/c\\n'| sed '/=END=/c\\n'` ;;
         ("/recheck") $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ;;
         ("/renull") rm $DIR/.workers_down ; $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ;;
+        ("/cache") result=`cat $DIR/cache.txt | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | awk {'printf $1"   "$2"   "$3"   "$4"\n"'} | sed '/=START=/c\\n'| sed '/=END=/c\\n'` ;;
 #        ("/routeadd")result=` ./routeadd.sh` ;;
 	(*) result="Unknown command!" ;;
 esac
