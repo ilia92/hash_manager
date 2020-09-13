@@ -54,7 +54,7 @@ fi
 
 if [[ $message_new ]] || [[ $message_still ]] || [[ $message_up ]]; then
 
-message_tail=`cat "$hash_checker_results_file" | grep "GENERATED\|SUM\|Active"`
+message_tail=`cat "$hash_checker_results_file" | grep "SUM\|Active"`
 message=`printf "${message_new}${message_still}${message_up}\n${message_tail}"`
 
 printf "Message:\n$message\n"
