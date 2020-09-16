@@ -3,3 +3,5 @@
 .api_key
 .workers_down
 cache.txt
+manager.conf
+

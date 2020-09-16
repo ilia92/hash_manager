@@ -38,5 +38,5 @@ header("Refresh:0");
 include 'config.php';
 $cachepage = shell_exec("cat $hash_manager_loc/cache.txt | aha");
 echo $cachepage;
-
+header("Refresh: $refresh_page");
 ?>
