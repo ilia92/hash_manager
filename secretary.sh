@@ -3,9 +3,14 @@
 DIR="$(dirname "$(readlink -f "$0")")"
 
 source $DIR/manager.conf
+source $DIR/functions/sendtext.func
 api_key=`cat "$api_key_file"`
 
-if [ -z "$STY" ]; then printf "Bot started in background\n" ; screen -S secretary_bot -X quit ; exec screen -dm -S secretary_bot /bin/bash $0 ; fi
+if [ -z "$STY" ]; then
+printf "Bot started in background\n"
+screen -S secretary_bot -X quit > /dev/null
+exec screen -dm -S secretary_bot /bin/bash $0
+fi
 
 refresh_rate=1
 
@@ -22,10 +27,6 @@ help_section="
 /renull - Clear memory and start notifying again
 /cache - Shows cached results
 "
-
-sendtext() {
-curl -X POST https://api.telegram.org/bot$api_key/sendMessage -d chat_id=$chat_id -d text="$1" >/dev/null 2>&1 ;
-}
 
 while [ 1 ]
 do
@@ -54,7 +55,7 @@ case "$command" in
 	("/test") result="test PASS!" ;;
         ("/help") result="$help_section" ;;
         ("/pinger") result=`$DIR/pinger.sh $arg` ;;
-        ("/rigres") sendtext "Sending restart procedure ..." ; $DIR/rigres.sh $arg --no-send ; result=`$DIR/pinger.sh $arg` ;;
+        ("/rigres") result=`$DIR/rigres.sh $arg --notify` ;;
         ("/full") result=`$DIR/hash_checker.sh --full | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | grep -v GENERATED | awk {'printf $1"   "$2"   "$3"   "$4"\n"'} | sed '/=START=/c\\n'| sed '/=END=/c\\n'` ;;
 	("/recheck") $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ; result="Recheck done! New result: /cache" ;;
         ("/renull") rm $DIR/.workers_down ; $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ;;

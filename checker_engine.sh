@@ -69,7 +69,7 @@ for j in `seq 1 $(($workers_count+1))`;
 
         hash_target_full=$(($w_target+$hash_target_full))
 
-foo
+foo 
 done
 >&2 printf "\n"
 

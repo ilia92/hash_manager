@@ -1,9 +1,10 @@
 #!/bin/bash
 
-#if [ -z "$STY" ]; then exec screen -dm -S rigres /bin/bash $0 $1 ; fi
-
 DIR="$(dirname "$(readlink -f "$0")")"
 source $DIR/manager.conf
+
+# Functions
+source $DIR/functions/sendtext.func
 
 api_key=`cat "$api_key_file"`
 
@@ -12,10 +13,17 @@ rig_line=`cat $DIR/workers.txt | cut -f1 -d"#" | sed '/^\s*$/d' | grep $rig_name
 rig_ip=`printf "$rig_line" | awk {'print $5'}`
 sonoff_ip=`printf "$rig_line" | awk {'print $6'}`
 
-if ! `timeout 0.5 ping -c 1 $sonoff_ip >/dev/null 2>&1`; then
+if ! `timeout 1 ping -c 1 $sonoff_ip >/dev/null 2>&1`; then
 printf "No ping to restarter, exiting\n"
 exit
+else
+printf "Restart procedure started in background: rr_$1\n"
 fi
+
+# Here the process is started in background. Only the output above is diplayed !
+# If there is --notify parameter, it sends the result down
+
+if [[ "$STY" !=  *"rr_$1"* ]]; then exec screen -dm -S rr_$1 /bin/bash $0 $1 $2; fi
 
 printf "Turning OFF the rig ...\n"
 
@@ -34,27 +42,33 @@ retries=100
 for i in `seq 1 $retries`;
 do
 if `timeout 0.5 ping -c 1 $rig_ip > /dev/null`; then
-#printf "$rig_name UP, go ahead\n\n"
+printf "$rig_name UP, go ahead\n\n"
 break
 elif [[ $i -gt $(($retries-1)) ]]; then
-printf "no ping, exit\n"
+message="no ping to $rig_name, exit"
+printf "$message\n"
+   if [ "$2" == "--notify" ]; then
+    sendtext "$message"
+    printf "Message was sent!"
+   fi
+sleep 60
 exit
 fi
 sleep 1
 done
 
-printf "$rig_name is ONLINE\n\n"
-
 sleep 90
 
-hash=`timeout 1 curl --silent $rig_ip:3333 | html2text -width 200 | grep "1 minute average\|Average speed" | tail -1 | grep -o -P '(?<=speed \(5 min\): ).*(?=MH/s)'\|'(?<=speed: ).*(?=Mh/s)' | cut -d. -f1`
+ping -c1 $rig_ip >/dev/null 2>&1 && updown="$rig_name is UP" || updown="$rig_name is DOWN"
+hash=`timeout 3 curl --silent $rig_ip:3333 | html2text -width 200 | grep "1 minute average\|Average speed" | tail -1 | grep -o -P '(?<=speed \(5 min\): ).*(?=MH/s)'\|'(?<=speed: ).*(?=Mh/s)' | cut -d. -f1`
 
-printf "Hashrate: $hash\n"
+#without printf - newline in telegram bugs
+message=`printf "$updown\nHashrate: $hash"`
+printf "$message\n"
 
-text=`printf "$rig is ONLINE\nHashrate: $hash\n"`
-
-if [[ $2 == "--no-send" ]]; then
-printf "$text"
-exit
+if [ "$2" == "--notify" ]; then
+sendtext "$message"
+printf "Message was sent!"
 fi
-
+# Screen stays for 60 seconds
+sleep 60
