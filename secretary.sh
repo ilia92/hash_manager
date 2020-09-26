@@ -26,6 +26,7 @@ help_section="
 /recheck - Rechecks rig hashrate
 /renull - Clear memory and start notifying again
 /cache - Shows cached results
+/switch - changes the pool
 "
 
 while [ 1 ]
@@ -46,7 +47,7 @@ curl -s "https://api.telegram.org/bot$api_key/getUpdates?offset=$update_id"  >/d
 fi
 
 command=`echo $curr_message_text | grep -o '\/.*' | awk {'print $1'} | sed "s|@$username||g"`
-arg=`echo $curr_message_text | awk {'print $2'}`
+arg=`echo $curr_message_text | awk {'print $2" "$3" "$4'}`
 
 #printf "$command and $arg"
 
@@ -60,6 +61,7 @@ case "$command" in
 	("/recheck") $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ; result="Recheck done! New result: /cache" ;;
         ("/renull") rm $DIR/.workers_down ; $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ;;
         ("/cache") result=`cat $DIR/cache.txt | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | awk {'printf $1"   "$2"   "$3"   "$4"\n"'} | sed '/=START=/c\==============='| sed '/=END=/c\==============='` ;;
+        ("/switch") result=`$DIR/pool_switcher.sh $arg` ;;
 #        ("/routeadd")result=` ./routeadd.sh` ;;
 	(*) result="Unknown command!" ;;
 esac
