@@ -4,5 +4,5 @@
 .workers_down
 cache.txt
 manager.conf
-parallels/*
 pools_and_wallets.txt
+parallels/*
