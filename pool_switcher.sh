@@ -8,13 +8,31 @@ workers_file_read=`cat $DIR/$workers_file | cut -f1 -d"#" | sed '/^\s*$/d' | gre
 criteria="$1"
 ips_file=$DIR/parallels/${criteria}.txt
 
+# The script imports predefined pools and example wallets
+source $DIR/pools_and_wallets.txt
+
 if ! [[ $criteria ]] || [[ $criteria == "--help" ]]; then
 printf "Usage: ./pool_switcher.sh [criteria/all] [pool_url] [wallet]\n"
 exit
 fi
 
+# Check for predefined
+
+if [ $( printf "$pools"| grep "$2" | wc -l ) == 1 ]; then
+pool=`printf "$pools"| grep "$2"`
+else
+pool="$2"
+fi
+
+if [ $( printf "$wallets" | grep "$3" | wc -l ) == 1 ]; then
+wallet=`printf "$wallets" | grep "$3"`
+else
+wallet="$3"
+fi
+# END Check for predined
+
 # The next IF checks for legit input
-if ! [[ "$2" == *":"???* ]] || ! ( [[ ${#3} -eq 42 ]] || [[ ${#3} -eq 40 ]] );then
+if ! [[ "$pool" == *":"???* ]] || ! ( [[ ${#wallet} -eq 42 ]] || [[ ${#wallet} -eq 40 ]] );then
 printf "Bad input!\n"
 printf "Usage: ./pool_switcher.sh [criteria/all] [pool_url] [wallet]\n"
 exit
@@ -28,4 +46,6 @@ fi
 
 printf "$workers_ips\n" > $ips_file
 
-parallel-ssh -o "StrictHostKeyChecking=no" -h $ips_file "sed -i '/pool/c\pool=\"$2\"' ~/rig_wallet ; sed -i '/wallet/c\wallet=\"$3\"' ~/rig_wallet; ./miner_launcher.sh"
+printf "The following parameters are used: $1 $pool $wallet\n"
+
+parallel-ssh -o "StrictHostKeyChecking=no" -h $ips_file "sed -i '/pool/c\pool=\"$pool\"' ~/rig_wallet ; sed -i '/wallet/c\wallet=\"$wallet\"' ~/rig_wallet; ./miner_launcher.sh"
