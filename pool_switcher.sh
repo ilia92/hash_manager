@@ -48,4 +48,4 @@ printf "$workers_ips\n" > $ips_file
 
 printf "The following parameters are used: $1 $pool $wallet\n"
 
-parallel-ssh -t 15 -h $ips_file "sed -i '/pool/c\pool=\"$pool\"' ~/rig_wallet ; sed -i '/wallet/c\wallet=\"$wallet\"' ~/rig_wallet; ./miner_launcher.sh"
+parallel-ssh -t 60 -h $ips_file "sed -i '/pool/c\pool=\"$pool\"' ~/rig_wallet ; sed -i '/wallet/c\wallet=\"$wallet\"' ~/rig_wallet; ./miner_launcher.sh"

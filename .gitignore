@@ -3,6 +3,6 @@
 .api_key
 .workers_down
 cache.txt
-manager.conf
 pools_and_wallets.txt
+manager.conf
 parallels/*
