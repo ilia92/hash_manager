@@ -1,0 +1,3 @@
+#miner_name	#rx/nv/win	#cards		#hash	#ip		#res_ip		#comment
+miner1		fyi		fyi		100	192.168.1.101	192.168.1.111
+miner2          fyi             fyi             200     192.168.1.102	192.168.1.112
