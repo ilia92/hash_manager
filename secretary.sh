@@ -57,7 +57,7 @@ case "$command" in
         ("/help") result="$help_section" ;;
         ("/pinger") result=`$DIR/pinger.sh $arg` ;;
         ("/rigres") result=`$DIR/rigres.sh $arg --notify` ;;
-        ("/full") result=`$DIR/hash_checker.sh --full | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | grep -v GENERATED | awk {'printf $1"   "$2"   "$3"   "$4"\n"'} | sed '/=START=/c\\n'| sed '/=END=/c\\n'` ;;
+        ("/full") result=`$DIR/hash_checker.sh --full | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | grep -v GENERATED | awk {'printf $1"   "$2"   "$3"   "$4"\n"'}  | sed '/=START=/c\==============='| sed '/=END=/c\==============='` ;;
 	("/recheck") $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ; result="Recheck done! New result: /cache" ;;
         ("/renull") rm $DIR/.workers_down ; $DIR/hash_checker.sh ; $DIR/telegram_notifier.sh ;;
         ("/cache") result=`cat $DIR/cache.txt | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | awk {'printf $1"   "$2"   "$3"   "$4"\n"'} | sed '/=START=/c\==============='| sed '/=END=/c\==============='` ;;
