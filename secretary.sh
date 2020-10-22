@@ -20,6 +20,7 @@ date
 
 help_section="
 /help - Prints this text
+/reward - Prints average network reward (3/7/24h Default: now)
 /pinger name - Check if rig is UP
 /rigres name - Restarts rig
 /softres name - Soft restart for a rig
@@ -56,6 +57,7 @@ case "$command" in
 	("") ;;
 	("/test") result="test PASS!" ;;
         ("/help") result="$help_section" ;;
+        ("/reward") if [ $arg ]; then  arg_info=`printf "/ ${arg}h /" | sed 's| ||g'`; fi ; result="Average ETH reward $arg_info: $(curl --silent https://whattomine.com/coins/151.json | jq .block_reward${arg} | grep -o "^.*\...") " ;;
         ("/pinger") result=`$DIR/pinger.sh $arg` ;;
         ("/rigres") result=`$DIR/rigres.sh $arg --notify` ;;
         ("/softres") result=`$DIR/softres.sh $arg --notify` ;;
