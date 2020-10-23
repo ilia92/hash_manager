@@ -20,7 +20,7 @@ date
 
 help_section="
 /help - Prints this text
-/reward - Prints average network reward (3/7/24h Default: now)
+/reward - Prints average network reward
 /pinger name - Check if rig is UP
 /rigres name - Restarts rig
 /softres name - Soft restart for a rig
@@ -57,7 +57,7 @@ case "$command" in
 	("") ;;
 	("/test") result="test PASS!" ;;
         ("/help") result="$help_section" ;;
-        ("/reward") arg_info= ; if [ $arg ]; then  arg_info=`printf "/ ${arg}h /" | sed 's| ||g'`; fi ; result="Average ETH reward $arg_info: $(curl --silent https://whattomine.com/coins/151.json | jq .block_reward${arg} | grep -o "^.*\...") " ;;
+        ("/reward") rew_info=`curl --silent https://whattomine.com/coins/151.json` ; result=`printf "Average ETH block reward:\nNow: $(echo $rew_info | jq .block_reward | grep -o "^.*\...")\n3h:   $(echo $rew_info | jq .block_reward3 | grep -o "^.*\...")\n7h:   $(echo $rew_info | jq .block_reward7 | grep -o "^.*\...")\n24h:  $(echo $rew_info | jq .block_reward24 | grep -o "^.*\...")"` ;;
         ("/pinger") result=`$DIR/pinger.sh $arg` ;;
         ("/rigres") result=`$DIR/rigres.sh $arg --notify` ;;
         ("/softres") result=`$DIR/softres.sh $arg --notify` ;;
