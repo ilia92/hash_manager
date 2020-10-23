@@ -21,6 +21,7 @@ date
 help_section="
 /help - Prints this text
 /reward - Prints average network reward
+/price - Prints ETH current price
 /pinger name - Check if rig is UP
 /rigres name - Restarts rig
 /softres name - Soft restart for a rig
@@ -58,6 +59,7 @@ case "$command" in
 	("/test") result="test PASS!" ;;
         ("/help") result="$help_section" ;;
         ("/reward") rew_info=`curl --silent https://whattomine.com/coins/151.json` ; result=`printf "Average ETH block reward:\nNow: $(echo $rew_info | jq .block_reward | grep -o "^.*\...")\n3h:   $(echo $rew_info | jq .block_reward3 | grep -o "^.*\...")\n7h:   $(echo $rew_info | jq .block_reward7 | grep -o "^.*\...")\n24h:  $(echo $rew_info | jq .block_reward24 | grep -o "^.*\...")"` ;;
+        ("/price") result="ETH price now: $(curl --silent https://api.kraken.com/0/public/Ticker -d 'pair=etheur' | jq -r .result.XETHZEUR.c[] | head -1 | grep -o "^.*\...") EUR" ;;
         ("/pinger") result=`$DIR/pinger.sh $arg` ;;
         ("/rigres") result=`$DIR/rigres.sh $arg --notify` ;;
         ("/softres") result=`$DIR/softres.sh $arg --notify` ;;
