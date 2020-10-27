@@ -36,6 +36,10 @@ sleep 50
 printf "\nPowering ON: "
 curl http://$sonoff_ip/cm?cmnd=Power%201
 printf "\n\n"
+
+# Make the rechecking and notifying mandatory
+sed -i -n "/${rig_name}/!p" $workers_down_file
+
 sleep 50
 
 retries=100

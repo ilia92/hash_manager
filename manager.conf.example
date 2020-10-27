@@ -4,3 +4,4 @@ messages_giveup=2
 hash_checker_results_file="$DIR/cache.txt"
 curl_timeout=3
 cache_file="$DIR/cache.txt"
+workers_down_file="$DIR/.workers_down"

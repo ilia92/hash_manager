@@ -6,8 +6,6 @@ source $DIR/manager.conf
 
 api_key=`cat "$api_key_file"`
 
-workers_down_file="$DIR/.workers_down"
-
 hash_checker_results=`cat "$hash_checker_results_file" | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | sed -n '/============================START===========================/,/=============================END============================/p' | grep -v 'START\|END' | awk {'printf $1"   "$2"   "$3"   "$4"\n"'}`
 
 touch "$workers_down_file"
