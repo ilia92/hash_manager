@@ -32,7 +32,7 @@ fi
 # END Check for predined
 
 # The next IF checks for legit input
-if ! [[ "$pool" == *":"???* ]] || ! ( [[ ${#wallet} -eq 42 ]] || [[ ${#wallet} -eq 40 ]] );then
+if ! [[ "$pool" == *":"???* ]] || ! ( [[ ${#wallet} -eq 42 ]] || [[ ${#wallet} -eq 40 ]] || [[ ${#wallet} -eq 85 ]] || [[ ${#wallet} -eq 83 ]] );then
 printf "Bad input!\n"
 printf "Usage: ./pool_switcher.sh [criteria/all] [pool_url] [wallet]\n"
 exit
