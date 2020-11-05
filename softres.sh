@@ -25,8 +25,6 @@ printf "Stopping and Restarting the rig ...\n"
 timeout 10 ssh miner@$rig_ip 'screen -S ethm -X stuff "12" ; sleep 0.5 ; screen -S ethm -X stuff "34" ; sleep 0.5 ; screen -S ethm -X stuff "56" ; sleep 0.5 ; screen -S ethm -X stuff "78" ; sleep 0.5 ; screen -S ethm -X stuff "9a" ; sleep 0.5 ; pkill -9 start.sh ; screen -dm bash -c "sleep 4; echo b > /proc/sysrq-trigger" '
 
 sleep 50
-# Make the rechecking and notifying mandatory
-sed -i -n "/${rig_name}/!p" $workers_down_file
 
 retries=100
 for i in `seq 1 $retries`;
