@@ -38,6 +38,11 @@ fi
 foo() {
 #curl_min_hash_a[$j]=`timeout $curl_timeout curl --silent $w_ip_port | html2text -width 200 | grep "1 minute average\|Average speed" | tail -1 | grep -o -P '(?<=speed: ).*(?=Mh/s)'| cut -d. -f1 &`
 curl_min_hash_a[$j]=`timeout $curl_timeout curl --silent $w_ip_port | html2text -width 200 | grep "1 minute average\|Average speed" | tail -1 | grep -o -P '(?<=speed \(5 min\): ).*(?=MH/s)'\|'(?<=speed: ).*(?=Mh/s)' | cut -d. -f1`
+if ! [[ ${curl_min_hash_a[$j]} ]]; then
+# printf "TRM miner\n"
+ w_ip_port=`echo "$w_ip_port" | sed "s|:| |g"`
+ curl_min_hash_a[$j]=`echo summary | nc $w_ip_port | grep -o -P '(?<=30s=).*(?=,KHS av)' | cut -d. -f1`
+fi
 }
 
 for j in `seq 1 $(($workers_count+1))`;
