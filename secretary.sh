@@ -52,7 +52,7 @@ fi
 command=`echo $curr_message_text | grep -o '\/.*' | awk {'print $1'} | sed "s|@$username||g"`
 arg=`echo $curr_message_text | awk {'print $2" "$3" "$4'}`
 
-#printf "$command and $arg"
+printf "$command and $arg"
 
 case "$command" in
 	("") ;;

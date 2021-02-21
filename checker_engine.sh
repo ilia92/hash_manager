@@ -41,7 +41,7 @@ curl_min_hash_a[$j]=`timeout $curl_timeout curl --silent $w_ip_port | html2text 
 if ! [[ ${curl_min_hash_a[$j]} ]]; then
 # printf "TRM miner\n"
  w_ip_port=`echo "$w_ip_port" | sed "s|:| |g"`
- curl_min_hash_a[$j]=`echo summary | nc $w_ip_port | grep -o -P '(?<=30s=).*(?=,KHS av)' | cut -d. -f1`
+ curl_min_hash_a[$j]=`echo summary | nc -w 2 $w_ip_port | grep -o -P '(?<=30s=).*(?=,KHS av)' | cut -d. -f1`
 fi
 }
 
